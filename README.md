@@ -18,6 +18,8 @@
   </tr>
 </table>
 
+**[Join our Discord community](https://discord.gg/CdHSakKSFv)** for support and discussions.
+
 ---
 
 ## Proof of Concept
