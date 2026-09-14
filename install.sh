@@ -188,8 +188,8 @@ version_supported() {
     return 1
 }
 
-detected=""
-if [[ -r /proc/driver/nvidia/version ]]; then
+detected="${CMPUNLOCKER_DRIVER_VERSION:-}"   # explicit override (needed when the running module is older than the installed packages)
+if [[ -z "${detected}" && -r /proc/driver/nvidia/version ]]; then
     detected="$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+' /proc/driver/nvidia/version | head -1 || true)"
 fi
 if [[ -z "${detected}" ]] && command -v nvidia-smi &>/dev/null; then
