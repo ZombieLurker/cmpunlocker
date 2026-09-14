@@ -142,3 +142,7 @@ unlocks:
   ecc-reporting:
     patch: ecc-reporting.patch
     registers: {}
+
+  p2p:
+    patch: unlock-p2p-v3-610.57.04.patch
+    registers: {}
