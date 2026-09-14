@@ -47,7 +47,6 @@ info "Building against open-gpu-kernel-modules ${VERSION}"
 PATCH_ORDER=(
     sec2-postbl-plm-ss-cfg.patch
     booter-verify.patch
-    late-pma.patch
     bar0-pramin-clamp.patch
     ce-scrub-workarounds.patch
     persistent-sw-state.patch
@@ -55,6 +54,7 @@ PATCH_ORDER=(
     pcie-gen2-probe-retrain.patch
     name-string.patch
     bar1-resize-unlock.patch
+    unlock-p2p.patch
 )
 PATCH_FILES=()
 for name in "${PATCH_ORDER[@]}"; do
