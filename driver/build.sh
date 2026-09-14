@@ -60,6 +60,7 @@ PATCH_ORDER=(
     ecc-enable.patch
     ecc-fbpa-static.patch
     ecc-reporting.patch
+    unlock-p2p-v3-610.57.04.patch
 )
 PATCH_FILES=()
 for name in "${PATCH_ORDER[@]}"; do
