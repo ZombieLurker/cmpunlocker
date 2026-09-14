@@ -33,6 +33,5 @@ echo "== 5/5 libcuda mixed-generation P2P patch (REQUIRED for 3090<->170HX: kern
 LC=/usr/lib/x86_64-linux-gnu/libcuda.so.610.57.04
 [[ -f $LC.bak ]] || cp -a "$LC" "$LC.bak"
 if python3 tools/patch-libcuda-p2p.py "$LC"; then echo "   libcuda patched (backup $LC.bak)"; else echo "   libcuda: signatures not found -- already patched, or a different build; verify with the p2pmix.py test after boot"; fi
-echo "== done. (old note: libcuda patch is NOT applied yet (apply after boot only if 3090<->170HX P2P is still refused):"
-echo "   sudo cp /usr/lib/x86_64-linux-gnu/libcuda.so.610.57.04{,.bak} && sudo python3 tools/patch-libcuda-p2p.py /usr/lib/x86_64-linux-gnu/libcuda.so.610.57.04"
+echo "== done."
 echo "NOW: cold boot  ->  sudo shutdown -h now, then power on."
