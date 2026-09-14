@@ -124,3 +124,7 @@ unlocks:
   cmp-sku-mask:
     patch: cmp-sku-mask.patch
     registers: {}
+
+  p2p:
+    patch: unlock-p2p-v3-610.57.04.patch
+    registers: {}
