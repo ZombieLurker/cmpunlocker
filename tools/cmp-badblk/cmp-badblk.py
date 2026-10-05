@@ -176,7 +176,9 @@ def boot_fences(present):
     fences, assumed = {}, False
     by_index = {c["index"]: c["pci"] for c in present}
     for line in boot_log().splitlines():
-        if "CMP_BADBLK" not in line:
+        # Only the per-card lines (static BAR1 and each blacklisted frame); the summary line
+        # ("N frames blacklisted") carries no PCI address.
+        if "CMP_BADBLK" not in line or not ("static BAR1" in line or "blacklist 64K" in line):
             continue
         m = re.search(r"pci=([0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.0)", line)
         if m:
