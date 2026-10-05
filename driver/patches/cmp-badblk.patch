@@ -25,8 +25,8 @@
 +        if (pKernelBus != NULL)
 +        {
 +            NV_PRINTF(LEVEL_ERROR,
-+                      "CMP_BADBLK: static BAR1 enabled=%u startOffset=0x%llx\n",
-+                      pKernelBus->bar1[GPU_GFID_PF].bStaticBar1Enabled,
++                      "CMP_BADBLK: pci=%04x:%02x:%02x.0 static BAR1 enabled=%u startOffset=0x%llx\n",
++                      gpuGetDomain(pGpu), gpuGetBus(pGpu), gpuGetDevice(pGpu), pKernelBus->bar1[GPU_GFID_PF].bStaticBar1Enabled,
 +                      pKernelBus->bar1[GPU_GFID_PF].staticBar1.startOffset);
 +        }
 +
@@ -41,8 +41,8 @@
 +            bbAddr = ((NvU64)bbVal) << 16;
 +            bbStatus = pmaAddToBlacklistTracking(pPma, bbAddr);
 +            NV_PRINTF(LEVEL_ERROR,
-+                      "CMP_BADBLK: %s blacklist 64K frame at 0x%llx status=0x%x\n",
-+                      cmpBadBlkKeys[bbIdx], bbAddr, bbStatus);
++                      "CMP_BADBLK: pci=%04x:%02x:%02x.0 %s blacklist 64K frame at 0x%llx status=0x%x\n",
++                      gpuGetDomain(pGpu), gpuGetBus(pGpu), gpuGetDevice(pGpu), cmpBadBlkKeys[bbIdx], bbAddr, bbStatus);
 +            if (bbStatus == NV_OK)
 +                bbCount++;
 +        }
