@@ -1,0 +1,62 @@
+--- a/src/nvidia/src/kernel/gpu/mem_mgr/mem_mgr.c
++++ b/src/nvidia/src/kernel/gpu/mem_mgr/mem_mgr.c
+@@ -3720,6 +3720,59 @@
+     pmaGetFreeMemory(pPma, &pmaFree);
+     pmaGetTotalMemory(pPma, &pmaTotal);
+ 
++    //
++    // CMP bad-block fencing: mark known-bad 64 KB FB frames as blacklisted in PMA so they are
++    // never handed out. The list comes from per-GPU registry keys RmCmpBadBlk0..15, each the
++    // FB physical address >> 16 (64 KB units), e.g.
++    //   NVreg_RegistryDwordsPerDevice="pci=0000:81:00.0;RmCmpBadBlk0=0x74e19;RmCmpBadBlk1=0x74e39"
++    // PMA is still empty at this point (it runs right after PMA and heap init).
++    //
++    {
++        static const char *cmpBadBlkKeys[] = {
++            "RmCmpBadBlk0",  "RmCmpBadBlk1",  "RmCmpBadBlk2",  "RmCmpBadBlk3",
++            "RmCmpBadBlk4",  "RmCmpBadBlk5",  "RmCmpBadBlk6",  "RmCmpBadBlk7",
++            "RmCmpBadBlk8",  "RmCmpBadBlk9",  "RmCmpBadBlk10", "RmCmpBadBlk11",
++            "RmCmpBadBlk12", "RmCmpBadBlk13", "RmCmpBadBlk14", "RmCmpBadBlk15",
++        };
++        KernelBus *pKernelBus = GPU_GET_KERNEL_BUS(pGpu);
++        NvU32 bbIdx, bbVal, bbCount = 0;
++        NvU64 bbFreeBefore = pmaFree, bbFreeAfter = 0;
++
++        if (pKernelBus != NULL)
++        {
++            NV_PRINTF(LEVEL_ERROR,
++                      "CMP_BADBLK: static BAR1 enabled=%u startOffset=0x%llx\n",
++                      pKernelBus->bar1[GPU_GFID_PF].bStaticBar1Enabled,
++                      pKernelBus->bar1[GPU_GFID_PF].staticBar1.startOffset);
++        }
++
++        for (bbIdx = 0; bbIdx < NV_ARRAY_ELEMENTS(cmpBadBlkKeys); bbIdx++)
++        {
++            NvU64 bbAddr;
++            NV_STATUS bbStatus;
++
++            if (osReadRegistryDword(pGpu, cmpBadBlkKeys[bbIdx], &bbVal) != NV_OK || bbVal == 0)
++                continue;
++
++            bbAddr = ((NvU64)bbVal) << 16;
++            bbStatus = pmaAddToBlacklistTracking(pPma, bbAddr);
++            NV_PRINTF(LEVEL_ERROR,
++                      "CMP_BADBLK: %s blacklist 64K frame at 0x%llx status=0x%x\n",
++                      cmpBadBlkKeys[bbIdx], bbAddr, bbStatus);
++            if (bbStatus == NV_OK)
++                bbCount++;
++        }
++
++        if (bbCount != 0)
++        {
++            pmaGetFreeMemory(pPma, &bbFreeAfter);
++            NV_PRINTF(LEVEL_ERROR,
++                      "CMP_BADBLK: %u frames blacklisted, PMA free 0x%llx -> 0x%llx\n",
++                      bbCount, bbFreeBefore, bbFreeAfter);
++            pmaFree = bbFreeAfter;
++        }
++    }
++
+     for (i = 0; i < pMemoryManager->Ram.numFBRegions; i++)
+     {
+         FB_REGION_DESCRIPTOR *pRegion = &pMemoryManager->Ram.fbRegion[i];

@@ -128,3 +128,7 @@ unlocks:
   p2p:
     patch: unlock-p2p-v3-610.57.04.patch
     registers: {}
+
+  cmp-badblk:
+    patch: cmp-badblk.patch
+    registers: {}
