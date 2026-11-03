@@ -69,7 +69,7 @@ def boot_log():
 
 def check_driver():
     """The fencing patch must be loaded, and every static BAR1 must start at offset 0."""
-    offs = re.findall(r"CMP_BADBLK: static BAR1 enabled=(\d) startOffset=(0x[0-9a-f]+)", boot_log())
+    offs = re.findall(r"CMP_BADBLK: (?:pci=\S+ )?static BAR1 enabled=(\d) startOffset=(0x[0-9a-f]+)", boot_log())
     if not offs:
         sys.exit("No CMP_BADBLK lines in this boot's kernel log: the driver with cmp-badblk.patch is not loaded.")
     bad = [o for o in offs if o != ("1", "0x0")]
