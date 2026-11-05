@@ -5,7 +5,7 @@ set -euo pipefail
 [[ $EUID -eq 0 ]] || { echo "run with sudo"; exit 1; }
 cd /nfs/docker/staging/cmpunlocker
 BR=$(git -c safe.directory="*" rev-parse --abbrev-ref HEAD); echo "== branch $BR ($(git -c safe.directory="*" rev-parse --short HEAD))"
-[[ "$BR" == v0.4-p2pv3-74sm-610.57.04 || "$BR" == v0.4-p2pv3-74sm-ecc-610.57.04 || "$BR" == v0.4-p2pv3-74sm-badblk-610.57.04 ]] || { echo "unexpected branch"; exit 1; }
+[[ "$BR" == v0.4-p2pv3-74sm-610.57.04 || "$BR" == v0.4-p2pv3-74sm-ecc-610.57.04 || "$BR" == v0.4-p2pv3-74sm-badblk-610.57.04 || "$BR" == v0.5-p2pv3-badblk-610.57.04 ]] || { echo "unexpected branch"; exit 1; }
 LOG=logs/install-$BR-$(date +%Y%m%dT%H%M%S).log; mkdir -p logs
 echo "== 1/4 build + install (no VFIO passthrough), log $LOG"
 CMPUNLOCKER_DRIVER_VERSION=610.57.04 ./install.sh --no-passthrough 2>&1 | tee "$LOG"
@@ -21,7 +21,7 @@ D=/lib/modules/$(uname -r)/updates/cmpunlocker
 V=$(modinfo -F version $D/nvidia.ko); echo "   nvidia.ko version $V"; [[ "$V" == 610.57.04 ]] || { echo "ERROR: wrong module version, DO NOT REBOOT"; exit 1; }
 [[ "$(modinfo -n nvidia)" == "$D/nvidia.ko" ]] && echo "   modprobe resolves nvidia to $D (good)" || { echo "ERROR: modprobe resolves nvidia to $(modinfo -n nvidia), DO NOT REBOOT"; exit 1; }
 grep -aq "SM-RECONFIG" $D/nvidia.ko && echo "   74 SM code present" || { echo "ERROR: 74 SM code missing"; exit 1; }
-[[ "$BR" == *ecc* ]] && echo "   ECC branch installed" || true
+grep -aq "ecc" $D/nvidia.ko && [[ "$BR" == *ecc* || "$BR" == v0.5* ]] && echo "   ECC branch installed" || true
 grep -aq "CMP_BADBLK" $D/nvidia.ko && echo "   bad-block fencing code present" || true
 echo "== 4/4 libcuda mixed-generation P2P patch"
 LC=/usr/lib/x86_64-linux-gnu/libcuda.so.610.57.04
